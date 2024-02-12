@@ -7,20 +7,20 @@
 
 using namespace std;
 
-optional<int> value;
-condition_variable cond;
-mutex m;
+optional<int> val;
+condition_variable cond; // used to wait for val to have a value
+mutex m; // protects val
 
 void consume()
 {
     while (true)
     {
         unique_lock lock {m};
-        while (!value.has_value())
+        while (!val.has_value())
             cond.wait(lock);
 
-        cerr << this_thread::get_id() << ": " << *value << "\n";
-        value = nullopt;
+        cerr << this_thread::get_id() << ": " << *val << "\n";
+        val = nullopt;
     }
 }
 
@@ -33,7 +33,7 @@ int main()
     {
         {
             scoped_lock lock {m};
-            value = i;
+            val = i;
             cond.notify_all();
         }
         this_thread::sleep_for(1s);
