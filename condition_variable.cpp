@@ -7,7 +7,7 @@
 
 using namespace std;
 
-optional<int> val;
+optional<int> val = nullopt;
 condition_variable cond; // used to wait for val to have a value
 mutex m; // protects val
 
@@ -34,7 +34,7 @@ int main()
         {
             scoped_lock lock {m};
             val = i;
-            cond.notify_all();
+            cond.notify_one();
         }
         this_thread::sleep_for(1s);
     }
